@@ -22,10 +22,10 @@ class RedBeanStorageProvider implements StorageProvider
     /**
      * @throws RuntimeException
      */
-    public function initialize() : void
+    public function initialize(): void
     {
-        if (! is_dir($this->data_dir)) {
-            if (! mkdir($this->data_dir, 0777, true) && ! is_dir($this->data_dir)) {
+        if (!is_dir($this->data_dir)) {
+            if (!mkdir($this->data_dir, 0777, true) && !is_dir($this->data_dir)) {
                 throw new RuntimeException(sprintf('Directory "%s" was not created', $this->data_dir));
             }
         }
@@ -34,19 +34,19 @@ class RedBeanStorageProvider implements StorageProvider
         R::useWriterCache(true);
     }
 
-    public function saveError(string $hash, array $error_data, array $context_data) : bool
+    public function saveError(string $hash, array $error_data, array $context_data): bool
     {
         // Ensure data directory exists (double-check, though initialize should handle it)
-        if (! is_dir($this->data_dir)) {
+        if (!is_dir($this->data_dir)) {
             error_log("Ventura data directory missing during saveError: " . $this->data_dir);
 
             return false;
         }
 
-        $errorBean = R::findOne('error', 'hash = ?', [ $hash ]);
+        $errorBean = R::findOne('error', 'hash = ?', [$hash]);
 
         if ($errorBean instanceof OODBBean) {
-            $errorBean->count ++;
+            $errorBean->count++;
             $errorBean->updated = time();
         } else {
             $errorBean = R::dispense('error');
@@ -81,12 +81,12 @@ class RedBeanStorageProvider implements StorageProvider
      * Moved from the global scope into the RedBean specific implementation.
      *
      * @param OODBBean $errorBean The RedBeanPHP bean to populate.
-     * @param string   $hash The calculated hash for the error.
-     * @param array    $error_data The original error data array.
+     * @param string $hash The calculated hash for the error.
+     * @param array $error_data The original error data array.
      *
      * @return void
      */
-    private function populateNewErrorBean(OODBBean $errorBean, string $hash, array $error_data) : void
+    private function populateNewErrorBean(OODBBean $errorBean, string $hash, array $error_data): void
     {
         $errorBean->hash = $hash;
         $errorBean->code = $error_data['code'];
@@ -103,5 +103,47 @@ class RedBeanStorageProvider implements StorageProvider
         $errorBean->count = 1;
         $errorBean->created = time();
         $errorBean->updated = time(); // Set updated time on creation
+    }
+
+    public function getTopErrors(int $limit = 50): array
+    {
+        $errors = R::findAll('error', ' ORDER BY count DESC LIMIT ?', [$limit]);
+
+        return $errors;
+    }
+
+    /**
+     * Retrieves error details by its unique hash identifier.
+     *
+     * @param string $hash The unique hash that identifies the error
+     * @return array|null Array containing error details and context if found, null otherwise
+     */
+    public function getErrorById(string $hash): ?array
+    {
+        $error = R::findOne('error', 'hash = ?', [$hash]);
+
+        if (!$error instanceof OODBBean) {
+            return null;
+        }
+
+        $contextList = array_map(
+            static fn($context) => json_decode($context->data, true),
+            array_slice(array_values($error->ownContextList), -3)
+        );
+
+        return [
+            'id' => $error->getID(),
+            'hash' => $error->hash,
+            'code' => $error->code,
+            'message' => $error->message,
+            'file' => $error->file,
+            'line' => $error->line,
+            'type' => $error->type,
+            'trace' => json_decode($error->trace, true),
+            'count' => $error->count,
+            'created' => $error->created,
+            'updated' => $error->updated,
+            'context' => $contextList
+        ];
     }
 }

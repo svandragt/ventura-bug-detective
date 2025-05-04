@@ -1,0 +1,37 @@
+{
+    "name": "sander/ventura",
+    "version": "1.0.0",
+    "authors": [
+        {
+            "name": "Sander van Dragt",
+            "email": "sander@vandragt.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.4",
+        "ext-sqlite3": "*",
+        "gabordemooij/redbean": "^5.7"
+    },
+    "require-dev": {
+        "phpcompatibility/php-compatibility": "^9.3",
+        "roave/security-advisories": "dev-latest",
+        "squizlabs/php_codesniffer": "^3.12"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ventura\\": "src/"
+        },
+        "files": [
+            "src/ventura.php"
+        ]
+    },
+    "scripts": {
+        "post-install-cmd": "vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility",
+        "post-update-cmd": "vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility",
+        "lint": "vendor/bin/phpcs .",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "php -S localhost:8080 -t src/"
+        ]
+    }
+}

@@ -3,6 +3,9 @@
 A minimal PHP error and exception handler designed to capture, group, and store errors using extensible storage
 providers.
 
+![deepimg-1746361786008](https://github.com/user-attachments/assets/a4e3882f-3478-4e2c-bef5-a2b69cec766c)
+
+
 ## Features
 
 * **Error Handling:** Captures PHP errors (Warnings, Notices, Errors, etc.) using `set_error_handler`.

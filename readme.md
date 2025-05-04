@@ -22,8 +22,10 @@ providers.
 Ventura is designed to work with different storage backends via implementations. `StorageProvider`
 
 - **(Default):`Ventura\Storage\RedBeanStorageProvider`** Uses the RedBeanPHP library to store error data. By default, it
-  likely creates a SQLite database file within the configured . Ensure you have `gabordemooij/redbean` required in
-  your . `VENTURA_STORAGE_DATA_DIR``composer.json`
+  creates a SQLite database file within the configured storage directory. Configure the storage location using the
+  `VENTURA_STORAGE_DATA_DIR` environment variable (defaults to `src/data`). Ensure you have `gabordemooij/redbean`
+  required in
+  your `composer.json`.
 
 You can create your own provider by implementing the necessary methods (likely `initialize`, `saveError`) and
 configuring Ventura to use your class via the environment variable. `VENTURA_STORAGE_PROVIDER_CLASS`

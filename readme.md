@@ -14,7 +14,7 @@ providers.
 * **Extensible Storage:** Uses a `StorageProvider` interface (implied, based on configuration logic) allowing different
   storage backends.
 * **Configurable:** Configuration primarily through environment variables.
-* **Included Provider:** Comes with a `RedBeanStorageProvider` for storing errors using RedBeanPHP (presumably in a
+* **Included Provider:** Comes with a `RedBeanStorageProvider` for storing errors using RedBeanPHP (in a
   SQLite database by default).
 
 ## Storage Providers
